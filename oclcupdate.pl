@@ -27,6 +27,10 @@
 # Author:  Andrew Nisbet, Edmonton Public Library
 # Created: Wed Jul 9 11:34:55 MDT 2014
 # Rev: 
+#          0.2 - Add parsing for TCNs from OCLC that start (Sirsi) since
+#                the prefix will cause the selcatalog -iF to fail. 
+#                Confirmed:  echo "(Sirsi) a728376" | selcatalog -iF fails
+#                Confirmed:  echo "a728376" | selcatalog -iF succeeds
 #          0.1 - Initial tested. 
 #          0.0 - Dev. 
 #
@@ -44,7 +48,7 @@ use Getopt::Std;
 $ENV{'PATH'}  = qq{:/s/sirsi/Unicorn/Bincustom:/s/sirsi/Unicorn/Bin:/usr/bin:/usr/sbin};
 $ENV{'UPATH'} = qq{/s/sirsi/Unicorn/Config/upath};
 ###############################################
-my $VERSION                     = qq{0.1};
+my $VERSION                     = qq{0.2};
 # my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/cronjobscripts/OCLC};
 my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/anisbet};
 my $LOG_DIR                     = $OCLC_DIR;
@@ -146,6 +150,9 @@ sub getXRefRecords( $$ )
 		# lets split the line on the white space swap the values so the 001 (TCN) field is first.
 		my @oclc001 = split( /\s{2,}/, $line );
 		chomp( $oclc001[1] );
+		# Strip off the leading '(Sirsi)' as per revision 0.2 notes.
+		$oclc001[1] =~ s/\(Sirsi\)//;
+		$oclc001[1] = trim( $oclc001[1] );
 		# Looks like $hash->{ TCN } = OCLC_Num
 		# Looks like $hash->{ a475180 } = 51296469
 		$hash->{$oclc001[1]} = $oclc001[0];
