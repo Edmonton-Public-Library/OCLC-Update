@@ -152,6 +152,7 @@ sub getXRefRecords( $$ )
 		chomp( $oclc001[1] );
 		# Strip off the leading '(Sirsi)' as per revision 0.2 notes.
 		$oclc001[1] =~ s/\(Sirsi\)//;
+		# We do this to remove the white space between the, now gone, '(Sirsi)' and the number.
 		$oclc001[1] = trim( $oclc001[1] );
 		# Looks like $hash->{ TCN } = OCLC_Num
 		# Looks like $hash->{ a475180 } = 51296469
