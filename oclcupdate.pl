@@ -49,8 +49,8 @@ $ENV{'PATH'}  = qq{:/s/sirsi/Unicorn/Bincustom:/s/sirsi/Unicorn/Bin:/usr/bin:/us
 $ENV{'UPATH'} = qq{/s/sirsi/Unicorn/Config/upath};
 ###############################################
 my $VERSION                     = qq{0.2};
-# my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/cronjobscripts/OCLC};
-my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/anisbet};
+my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/cronjobscripts/OCLC};
+# my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/anisbet};
 my $LOG_DIR                     = $OCLC_DIR;
 chomp( my $date                 = `transdate -d-0` );
 my $LOG_FILE_NAME               = qq{$LOG_DIR/oclc$date.log};  # Name and location of the log file.
