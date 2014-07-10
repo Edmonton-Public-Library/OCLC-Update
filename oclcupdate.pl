@@ -27,6 +27,8 @@
 # Author:  Andrew Nisbet, Edmonton Public Library
 # Created: Wed Jul 9 11:34:55 MDT 2014
 # Rev: 
+#          0.6 - Marks which records varied from OCLC report. 
+#          0.5 - Added count of titles that require OCLC update. 
 #          0.4 - Output of TCNs that are not referenced in OCLC report directly to log. 
 #          0.3 - Checked handling for TCNs that point to more than one cat key. 
 #                Added more comments.
@@ -51,7 +53,7 @@ use Getopt::Std;
 $ENV{'PATH'}  = qq{:/s/sirsi/Unicorn/Bincustom:/s/sirsi/Unicorn/Bin:/usr/bin:/usr/sbin};
 $ENV{'UPATH'} = qq{/s/sirsi/Unicorn/Config/upath};
 ###############################################
-my $VERSION                     = qq{0.4};
+my $VERSION                     = qq{0.6};
 my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/cronjobscripts/OCLC};
 # my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/anisbet};
 my $LOG_DIR                     = $OCLC_DIR;
@@ -262,6 +264,7 @@ exit 0 if ( $tcnCount == 0 );
 my $recordsWithSirsi035     = 0;
 my $recordsWithOCoLC035     = 0;
 my $totalBibRecordsModified = 0;
+my $recordsRequiringUpdate  = 0;
 my $selcatalogAPIResults    = `cat "$TEMP_DIR/tmp_a" | selcatalog -iF 2>/dev/null | prtmarc.pl -e"035" -oCFT`;
 # Even though a single TCN can (in our catalogue) reference titles each will get updated with oclc number and 
 # the appropriate '(Sirsi)' number.
@@ -297,19 +300,25 @@ foreach my $line ( @selcatalogRecord )
 	# we are going to replace them all here now.
 	foreach my $tag035 ( @tag035recordsList ) 
 	{
-		if ( $tag035 =~ m/\(Sirsi\)/ )
-		{
-			$recordsWithSirsi035++;
-			next; # We already put presine version in MARC.
-		}
-		if ( $tag035 =~ m/\(OCoLC\)/ )
-		{
-			$recordsWithOCoLC035++;
-			next; # We already put presine version in MARC.
-		}
 		# Since prtmarc.pl outputs like: # 728376|a728376       |\a(Sirsi) a728376|\a(CaAE) a728376|\a(OCoLC)123390892|
 		# remove the initial '\a'
 		$tag035 =~ s/^\\a//;
+		if ( $tag035 =~ m/\(Sirsi\)/ )
+		{
+			$recordsWithSirsi035++;
+			next; # We already put pristine version in MARC.
+		}
+		if ( $tag035 =~ m/\(OCoLC\)/ )
+		{
+			# We want to keep track of a count of records that required update.
+			if ( $tag035 !~ m/\(OCoLC\)($oclcNumber)/ )
+			{
+				$recordsRequiringUpdate++;
+				print LOG "* record update required.\n";
+			}
+			$recordsWithOCoLC035++;
+			next; # We already put pristine version in MARC.
+		}
 		print MARC_FLAT ".035.   |a$tag035\n";
 	}
 	$totalBibRecordsModified++;
@@ -321,7 +330,7 @@ if ( $opt{ 'U' } )
 }
 # Clean up the Temp TCN file if debug not selected.
 unlink( "$TEMP_DIR/tmp_a" ) if ( ! $opt{'d'} );
-logit( "\nTotal records reported by OCLC: $tcnCount\n  Records with Sirsi numbers: $recordsWithSirsi035\n  Records with OCLC numbers: $recordsWithOCoLC035\n  Total bib records examined: $totalBibRecordsModified" );
+logit( "\nTotal records reported by OCLC: $tcnCount\n  Records with Sirsi numbers: $recordsWithSirsi035\n  Records with OCLC numbers: $recordsWithOCoLC035\n  Records requiring update: $recordsRequiringUpdate\n  Total bib records examined: $totalBibRecordsModified" );
 logit( "\n===" );
 close( LOG );
 # EOF

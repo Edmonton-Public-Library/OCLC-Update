@@ -42,5 +42,5 @@ get:
 test:
 	perl -c ${APP}
 production: test
-	scp ${LOCAL}${APP} ${USER}@${PRODUCTION_SERVER}:${REMOTE}
+	scp ${LOCAL}${APP} ${USER}@${PRODUCTION_SERVER}:${REMOTE_PRODUCTION}
 
