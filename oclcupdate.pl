@@ -27,6 +27,8 @@
 # Author:  Andrew Nisbet, Edmonton Public Library
 # Created: Wed Jul 9 11:34:55 MDT 2014
 # Rev: 
+#          0.3 - Checked handling for TCNs that point to more than one cat key. 
+#                Added more comments.
 #          0.2 - Add parsing for TCNs from OCLC that start (Sirsi) since
 #                the prefix will cause the selcatalog -iF to fail. 
 #                Confirmed:  echo "(Sirsi) a728376" | selcatalog -iF fails
@@ -48,7 +50,7 @@ use Getopt::Std;
 $ENV{'PATH'}  = qq{:/s/sirsi/Unicorn/Bincustom:/s/sirsi/Unicorn/Bin:/usr/bin:/usr/sbin};
 $ENV{'UPATH'} = qq{/s/sirsi/Unicorn/Config/upath};
 ###############################################
-my $VERSION                     = qq{0.2};
+my $VERSION                     = qq{0.3};
 my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/cronjobscripts/OCLC};
 # my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/anisbet};
 my $LOG_DIR                     = $OCLC_DIR;
@@ -259,16 +261,18 @@ exit 0 if ( $tcnCount == 0 );
 my $recordsWithSirsi035     = 0;
 my $recordsWithOCoLC035     = 0;
 my $totalBibRecordsModified = 0;
-my $selcatalogAPIResults = `cat "$TEMP_DIR/tmp_a" | selcatalog -iF 2>/dev/null | prtmarc.pl -e"035" -oCFT`;
-my @selcatalogRecord     = split( '\n', $selcatalogAPIResults );
+my $selcatalogAPIResults    = `cat "$TEMP_DIR/tmp_a" | selcatalog -iF 2>/dev/null | prtmarc.pl -e"035" -oCFT`;
+# Even though a single TCN can (in our catalogue) reference titles each will get updated with oclc number and 
+# the appropriate '(Sirsi)' number.
+my @selcatalogRecord        = split( '\n', $selcatalogAPIResults );
 open( MARC_FLAT, ">$FLAT_MARC_OVERLAY_FILE_NAME" ) or die "Error: unable to write to '$FLAT_MARC_OVERLAY_FILE_NAME': $!\n";
 logit( "opening '$FLAT_MARC_OVERLAY_FILE_NAME'" );
 foreach my $line ( @selcatalogRecord )
 {
 	print LOG "$line\n"; # Keep the original for auditing.
 	# Each line looks like:
-	# cat key| TCN         | 035(1)          | 035(2)         | 035(n)           |
-	# 728376|a728376       |\a(Sirsi) a728376|\a(CaAE) a728376|\a(OCoLC)123390892|
+	# cat key| TCN         | 035(1)          | 035(2)         |...| 035(n)           |
+	# 728376|a728376       |\a(Sirsi) a728376|\a(CaAE) a728376|...|\a(OCoLC)123390892|
 	my ( $catKey, $titleControlNumber, @tag035recordsList ) = split( '\|', $line );
 	## Clean the title control number of extra white space for clean key reference.
 	$titleControlNumber = trim( $titleControlNumber );
@@ -316,7 +320,7 @@ if ( $opt{ 'U' } )
 }
 # Clean up the Temp TCN file if debug not selected.
 unlink( "$TEMP_DIR/tmp_a" ) if ( ! $opt{'d'} );
-logit( "Total records reported by OCLC: $tcnCount\n  Records with Sirsi numbers: $recordsWithSirsi035\n  Records with OCLC numbers: $recordsWithOCoLC035\n  Total bib records examined: $totalBibRecordsModified" );
-logit( "===" );
+logit( "\nTotal records reported by OCLC: $tcnCount\n  Records with Sirsi numbers: $recordsWithSirsi035\n  Records with OCLC numbers: $recordsWithOCoLC035\n  Total bib records examined: $totalBibRecordsModified" );
+logit( "\n===" );
 close( LOG );
 # EOF
