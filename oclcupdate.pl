@@ -1,5 +1,5 @@
 #!/s/sirsi/Unicorn/Bin/perl -w
-###################################################################
+########################################################################################
 #
 # Perl source file for project oclcupdate 
 # Purpose: Update bib records from OCLC transaction reports.
@@ -27,6 +27,7 @@
 # Author:  Andrew Nisbet, Edmonton Public Library
 # Created: Wed Jul 9 11:34:55 MDT 2014
 # Rev: 
+#          0.4 - Output of TCNs that are not referenced in OCLC report directly to log. 
 #          0.3 - Checked handling for TCNs that point to more than one cat key. 
 #                Added more comments.
 #          0.2 - Add parsing for TCNs from OCLC that start (Sirsi) since
@@ -36,7 +37,7 @@
 #          0.1 - Initial tested. 
 #          0.0 - Dev. 
 #
-######################################################################
+#########################################################################################
 
 use strict;
 use warnings;
@@ -50,7 +51,7 @@ use Getopt::Std;
 $ENV{'PATH'}  = qq{:/s/sirsi/Unicorn/Bincustom:/s/sirsi/Unicorn/Bin:/usr/bin:/usr/sbin};
 $ENV{'UPATH'} = qq{/s/sirsi/Unicorn/Config/upath};
 ###############################################
-my $VERSION                     = qq{0.3};
+my $VERSION                     = qq{0.4};
 my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/cronjobscripts/OCLC};
 # my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/anisbet};
 my $LOG_DIR                     = $OCLC_DIR;
@@ -280,7 +281,7 @@ foreach my $line ( @selcatalogRecord )
 	# if we don't find a oclc number just ignore it.
 	if ( ! defined $oclcNumber )
 	{
-		logit( "*** failed to find '$titleControlNumber' match in report." );
+		print LOG "*** failed to find '$titleControlNumber' match in report.\n";
 		next;
 	}
 	## Now we need to create the flat MARC file for overlaying on the bib records.
