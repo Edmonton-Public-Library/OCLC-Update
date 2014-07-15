@@ -24,6 +24,20 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA.
 #
+# Notes:
+# Once you have received batch load reports from OCLC, you can take the information in
+# them and update your bib records with correct OCLC numbers. The OCLC numbers are stored
+# in the .035. field of a bib record. This script relies on the fact that at EPL we match
+# our records in OCLC with the Title Control Number (TCN, or flex key) on our system. All 
+# of our bib records contain at least 2 .035. fields; the TCN which is the same as the
+# record's Sirsi number, and an OCLC number. When this script is run it reads all the reports
+# in the working directory (specified with $OCLC_DIR variable below), parses the reports
+# looks up the TCN listed in the report, extracts all the .035. records for each TCN, REPLACES or adds
+# any (Sirsi) <number> found with the record's accession number (.1003.), removes all (OCoLC) <number>
+# entries and replaces with the OCLC number listed in the report, then replaces any other 
+# .035. records it found for the record unmolested. If -U is used the changes are committed
+# to the ILS. 
+#
 # Author:  Andrew Nisbet, Edmonton Public Library
 # Created: Wed Jul 9 11:34:55 MDT 2014
 # Rev: 
