@@ -41,6 +41,7 @@
 # Author:  Andrew Nisbet, Edmonton Public Library
 # Created: Wed Jul 9 11:34:55 MDT 2014
 # Rev: 
+#          0.7 - Remove OCLC reports after processing. 
 #          0.6 - Marks which records varied from OCLC report. 
 #          0.5 - Added count of titles that require OCLC update. 
 #          0.4 - Output of TCNs that are not referenced in OCLC report directly to log. 
@@ -67,7 +68,7 @@ use Getopt::Std;
 $ENV{'PATH'}  = qq{:/s/sirsi/Unicorn/Bincustom:/s/sirsi/Unicorn/Bin:/usr/bin:/usr/sbin};
 $ENV{'UPATH'} = qq{/s/sirsi/Unicorn/Config/upath};
 ###############################################
-my $VERSION                     = qq{0.6};
+my $VERSION                     = qq{0.7};
 my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/cronjobscripts/OCLC};
 # my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/anisbet};
 my $LOG_DIR                     = $OCLC_DIR;
@@ -86,13 +87,14 @@ sub usage()
 {
     print STDERR << "EOF";
 
-	usage: $0 [-xdU]
+	usage: $0 [-cdUx]
 Updates bibrecords with missing OCLC numbers extracted from OCLC CrossRef Reports
 produced by the batch load process. Example input file: D120913.R468704.XREFRPT.txt.
 
 By default the script will go through the motions of what it is going to do including
 all output, but will NOT update bib records. To do that use the '-U' flag. See below.
 
+ -c : Clean up reports in the OCLC directory after process completion.        
  -d : debug (keeps temp files etc.)        
  -U : Actually do the update.             
  -x: This (help) message.
@@ -178,6 +180,13 @@ sub getXRefRecords( $$ )
 		$hash->{$oclc001[1]} = $oclc001[0];
 	}
 	close( REPORT );
+	# Remove the report if user selected -c option
+	if ( $opt{ 'c' } ) 
+	{
+		logit( "finished reading $file\n" );
+		unlink( $file );
+		logit( "removing $file. If you made a mistake you can re-download it from email or the batchload website.\n" );
+	}
 	return $hash;
 }
 
@@ -186,7 +195,7 @@ sub getXRefRecords( $$ )
 # return: <none>
 sub init
 {
-    my $opt_string = 'dUx';
+    my $opt_string = 'cdUx';
     getopts( "$opt_string", \%opt ) or usage();
     usage() if ( $opt{'x'} );
 }
