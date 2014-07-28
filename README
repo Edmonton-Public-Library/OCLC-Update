@@ -16,7 +16,8 @@ entries and replaces with the OCLC number listed in the report, then replaces an
 to the ILS.
 
 Instructions for Running:
-./oclcupdate
+./oclcupdate -x
+Produces the read me which will explain the most up to date instructions and examples.
 
 Product Description:
 Perl script written by Andrew Nisbet for Edmonton Public Library, distributable by the enclosed license.
