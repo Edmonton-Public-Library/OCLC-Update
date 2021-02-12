@@ -57,6 +57,15 @@
 #########################################################################################
 
 use strict;
+chomp($ENV{'HOME'} = `. ~/.bashrc; echo ~`);
+open(my $IN, "<", "$ENV{'HOME'}/Unicorn/Config/environ") or die "$0: $! $ENV{'HOME'}/Unicorn/Config/environ\n";
+while(<$IN>)
+{
+    chomp;
+    my ($key, $value) = split(/=/, $_);
+    $ENV{$key} = "$value";
+}
+close($IN);
 use warnings;
 use vars qw/ %opt /;
 use Getopt::Std;
@@ -65,8 +74,8 @@ use Getopt::Std;
 # without assuming any environment settings and we need to use sirsi's.
 ###############################################
 # *** Edit these to suit your environment *** #
-$ENV{'PATH'}  = qq{:/s/sirsi/Unicorn/Bincustom:/s/sirsi/Unicorn/Bin:/usr/bin:/usr/sbin};
-$ENV{'UPATH'} = qq{/s/sirsi/Unicorn/Config/upath};
+# $ENV{'PATH'}  = qq{:/s/sirsi/Unicorn/Bincustom:/s/sirsi/Unicorn/Bin:/usr/bin:/usr/sbin};
+# $ENV{'UPATH'} = qq{/s/sirsi/Unicorn/Config/upath};
 ###############################################
 my $VERSION                     = qq{0.7};
 my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/cronjobscripts/OCLC};
