@@ -1,4 +1,4 @@
-#!/s/sirsi/Unicorn/Bin/perl -w
+#!/software/EDPL/Unicorn/Bin/perl -w
 ########################################################################################
 #
 # Perl source file for project oclcupdate 
@@ -74,12 +74,12 @@ use Getopt::Std;
 # without assuming any environment settings and we need to use sirsi's.
 ###############################################
 # *** Edit these to suit your environment *** #
-# $ENV{'PATH'}  = qq{:/s/sirsi/Unicorn/Bincustom:/s/sirsi/Unicorn/Bin:/usr/bin:/usr/sbin};
-# $ENV{'UPATH'} = qq{/s/sirsi/Unicorn/Config/upath};
+# $ENV{'PATH'}  = qq{:/software/EDPL/Unicorn/Bincustom:/software/EDPL/Unicorn/Bin:/usr/bin:/usr/sbin};
+# $ENV{'UPATH'} = qq{/software/EDPL/Unicorn/Config/upath};
 ###############################################
 my $VERSION                     = qq{0.7};
-my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/cronjobscripts/OCLC};
-# my $OCLC_DIR                    = qq{/s/sirsi/Unicorn/EPLwork/anisbet};
+my $OCLC_DIR                    = qq{/software/EDPL/Unicorn/EPLwork/cronjobscripts/OCLC};
+# my $OCLC_DIR                    = qq{/software/EDPL/Unicorn/EPLwork/anisbet};
 my $LOG_DIR                     = $OCLC_DIR;
 chomp( my $date                 = `transdate -d-0` );
 my $LOG_FILE_NAME               = qq{$LOG_DIR/oclc$date.log};  # Name and location of the log file.
